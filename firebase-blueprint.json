@@ -1,0 +1,226 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role, usage counter, and customization preferences",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique user UID from Firebase Authentication"
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's customizable name or handle"
+        },
+        "email": {
+          "type": "string",
+          "description": "The registered email address"
+        },
+        "rank": {
+          "type": "string",
+          "enum": ["gratuito", "premium", "plus"],
+          "description": "The rank tier which grants a limited or unlimited action quota"
+        },
+        "registeredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of profile creation"
+        },
+        "actionsToday": {
+          "type": "integer",
+          "description": "Number of AI actions consumed by the user today"
+        },
+        "lastActionReset": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last action count reset"
+        },
+        "settings": {
+          "type": "object",
+          "description": "Personalized settings for voice speed, volume, and theme color"
+        }
+      },
+      "required": ["userId", "username", "email", "rank", "registeredAt"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "A notebook entry created by the user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Note unique ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the owner of this note"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the note"
+        },
+        "content": {
+          "type": "string",
+          "description": "Body content of the note"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last edit timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "content", "updatedAt"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A productivity to-do task item",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Task unique ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the owner of this task"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the task"
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the task has been completed"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "completed", "createdAt"]
+    },
+    "Reminder": {
+      "title": "Reminder",
+      "description": "A specific scheduled alarm or reminder",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Reminder unique ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the owner of this reminder"
+        },
+        "text": {
+          "type": "string",
+          "description": "What to remind the user about"
+        },
+        "time": {
+          "type": "string",
+          "description": "ISO string or human-readable event alert time"
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the reminder is cleared"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "userId", "text", "time", "completed", "createdAt"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "An event placed on the monthly interactive planner",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Event unique ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the owner of the event"
+        },
+        "title": {
+          "type": "string",
+          "description": "Event title"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date format YYYY-MM-DD"
+        },
+        "description": {
+          "type": "string",
+          "description": "Event detail description"
+        },
+        "color": {
+          "type": "string",
+          "description": "HEX color or category color tag"
+        },
+        "type": {
+          "type": "string",
+          "description": "Event type such as task, personal, work, custom"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "date", "createdAt"]
+    },
+    "CreatorOrder": {
+      "title": "CreatorOrder",
+      "description": "A programmatic instruction or behavior order set by the supreme developer Carlos Delgado for Nexia to enforce",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Order unique ID"
+        },
+        "text": {
+          "type": "string",
+          "description": "The exact instruction text"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": "Note",
+      "description": "Personal notebooks of user notes"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Interactive checklist of tasks"
+    },
+    "/users/{userId}/reminders/{reminderId}": {
+      "schema": "Reminder",
+      "description": "Scheduled voice and pop-up alerts"
+    },
+    "/users/{userId}/events/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Monthly planner visual events"
+    },
+    "/creator_orders/{orderId}": {
+      "schema": "CreatorOrder",
+      "description": "Global custom model rules configured dynamically by the supreme architect"
+    }
+  }
+}

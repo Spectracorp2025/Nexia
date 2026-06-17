@@ -1,0 +1,10 @@
+{
+  "name": "Nexia",
+  "description": "Tu Waifu Virtual e Inteligente con síntesis de voz, reproducción multimedia, calculadora matemática y recordatorios.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
