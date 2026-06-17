@@ -20,7 +20,7 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null && (
         request.auth.token.email == "carlosdelgado.neska@gmail.com" ||
-        request.auth.token.email == "carlosdelgadoneska@gmail.com"
+        request.auth.token.email == "carlosdelgado.neska+2@gmail.com"
       );
     }
   }
