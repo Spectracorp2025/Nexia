@@ -165,7 +165,7 @@ function getProgrammedResponse(msg: string, req: any, disrespectCount: number = 
     }
   }
 
-  // 0.5 Carlos (Creator) direct memory / directive automatic saving trigger (Save to db)
+  // 0.5 Creator direct memory / directive automatic saving trigger (Save to db)
   if (handlesCreator) {
     const memoryMatch = norm.match(/^(?:recuerda\s+que\s+|recuerda\s+|guarda\s+directriz:\s+|nueva\s+directriz:\s+)(.*)/i);
     if (memoryMatch) {
@@ -1023,7 +1023,7 @@ app.post("/api/chat", async (req, res) => {
       };
     });
 
-    // Check if user is the glorious creator Carlos Delgado
+    // Check if user is the glorious creator of Spectra
     const isGloriousCreator = email.trim().toLowerCase() === "carlosdelgado.neska@gmail.com";
 
     // Tailored interactive System Instructions to prevent name reveal and personalize his access
