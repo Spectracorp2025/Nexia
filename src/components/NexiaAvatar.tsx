@@ -412,7 +412,7 @@ export default function NexiaAvatar({
           id="touch-head"
           title="Consolar cabeza"
           onClick={() => handleTouch("head")}
-          className="absolute top-0 left-0 right-0 h-[22%] z-20 cursor-pointer bg-transparent hover:bg-cyan-400/5 transition-all active:bg-cyan-500/10 flex items-center justify-center group/sensor"
+          className="absolute top-0 left-0 right-0 h-[15%] z-20 cursor-pointer bg-transparent hover:bg-cyan-400/5 transition-all active:bg-cyan-500/10 flex items-center justify-center group/sensor"
         >
           <div className="opacity-0 group-hover/sensor:opacity-40 text-[10px] text-cyan-400 font-mono tracking-widest bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-400/20">
             [SENSAR CABEZA]
@@ -424,7 +424,7 @@ export default function NexiaAvatar({
           id="touch-face"
           title="Acariciar mejillas"
           onClick={() => handleTouch("face")}
-          className="absolute top-[22%] left-1/4 right-1/4 h-[18%] z-20 cursor-pointer bg-transparent hover:bg-pink-400/5 transition-all active:bg-pink-500/10 flex items-center justify-center group/senface"
+          className="absolute top-[15%] left-1/4 right-1/4 h-[15%] z-20 cursor-pointer bg-transparent hover:bg-pink-400/5 transition-all active:bg-pink-500/10 flex items-center justify-center group/senface"
         >
           <div className="opacity-0 group-hover/senface:opacity-40 text-[10px] text-pink-300 font-mono tracking-widest bg-pink-950/80 px-2 py-0.5 rounded border border-pink-400/20">
             [SENSAR MEJILLAS]
@@ -436,7 +436,7 @@ export default function NexiaAvatar({
           id="touch-body"
           title="Contacto corporal (Pecho)"
           onClick={() => handleTouch("body")}
-          className="absolute top-[40%] left-0 right-0 h-[18%] z-20 cursor-pointer bg-transparent hover:bg-red-400/5 transition-all active:bg-red-500/10 flex items-center justify-center group/senbody"
+          className="absolute top-[30%] left-0 right-0 h-[15%] z-20 cursor-pointer bg-transparent hover:bg-red-400/5 transition-all active:bg-red-500/10 flex items-center justify-center group/senbody"
         >
           <div className="opacity-0 group-hover/senbody:opacity-40 text-[10px] text-red-400 font-mono tracking-widest bg-red-950/80 px-2 py-0.5 rounded border border-red-400/20">
             [SENSAR PECHO]
@@ -448,7 +448,7 @@ export default function NexiaAvatar({
           id="touch-intim"
           title="Zona íntima inferior"
           onClick={() => handleTouch("intim")}
-          className="absolute top-[58%] left-0 right-0 h-[17%] z-20 cursor-pointer bg-transparent hover:bg-purple-600/10 transition-all active:bg-purple-700/25 flex items-center justify-center group/senintim"
+          className="absolute top-[45%] left-0 right-0 h-[15%] z-20 cursor-pointer bg-transparent hover:bg-purple-600/10 transition-all active:bg-purple-700/25 flex items-center justify-center group/senintim"
         >
           <div className="opacity-0 group-hover/senintim:opacity-60 text-[10px] text-purple-400 font-mono tracking-widest bg-purple-950/90 px-2 py-0.5 rounded border border-purple-500/30">
             [SENSAR ZONA ÍNTIMA DETECTADA]
@@ -460,7 +460,7 @@ export default function NexiaAvatar({
           id="touch-feet"
           title="Hacer cosquillas en los pies"
           onClick={() => handleTouch("feet")}
-          className="absolute top-[75%] left-0 right-0 bottom-0 z-20 cursor-pointer bg-transparent hover:bg-emerald-400/5 transition-all active:bg-emerald-500/10 flex items-end justify-center pb-2 group/senfeet"
+          className="absolute top-[60%] left-0 right-0 bottom-0 z-20 cursor-pointer bg-transparent hover:bg-emerald-400/5 transition-all active:bg-emerald-500/10 flex items-end justify-center pb-2 group/senfeet"
         >
           <div className="opacity-0 group-hover/senfeet:opacity-40 text-[10px] text-emerald-400 font-mono tracking-widest bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-400/20 mb-2">
             [SENSAR PIES / COSQUILLAS]
