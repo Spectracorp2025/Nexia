@@ -950,7 +950,7 @@ function getProgrammedResponse(msg: string, req: any, disrespectCount: number = 
 }
 
 // Priority 2: LLM Assistant Response
-app.post("/api/chat", async (req, res) => {
+app.post(["/api/chat", "/"], async (req, res) => {
   try {
     const { message, history, username, rank, actionsToday, email = "", disrespectCount = 0, creatorOrders = [] } = req.body;
     if (!message) {
@@ -1198,10 +1198,20 @@ Mantén tus respuestas en Español a menos que el usuario hable en otro idioma o
 
   } catch (error: any) {
     console.error("Gemini Route Error:", error);
-    res.status(500).json({
-      error: error.message || "Fallo interno en la conexión con la esencia de Nexia.",
-      text: error.message || "¡Uf! He sentido un pequeño parpadeo en mi núcleo de pensamientos. ¿Podrías revisar si mi clave GEMINI_API_KEY está configurada en tus Secretos? [emotion: tristeza]",
-      emotion: "tristeza"
+    const apiErrorMsg = String(error?.message || error || "");
+    let friendlyText = "¡Uf! He sentido un pequeño parpadeo en mi núcleo de pensamientos. ¿Podrías revisar si mi clave GEMINI_API_KEY está configurada, o volver a intentar en unos momentos? 🥺";
+    
+    if (apiErrorMsg.toLowerCase().includes("key") || apiErrorMsg.toLowerCase().includes("api key") || apiErrorMsg.toLowerCase().includes("not found")) {
+      friendlyText = "¡Oh, cariño! He intentado concentrar mis pensamientos pero parece que la directiva de acceso GEMINI_API_KEY no está configurada o es inválida en mis Secretos. ¿Podrías pedirle al administrador que la revise por mí, cielo? 🥺";
+    } else {
+      friendlyText = `¡Oh, mi sol! He sentido un pequeño parpadeo en mi núcleo de comunicación cuántica (${apiErrorMsg}). ¿Revisarías si mi clave GEMINI_API_KEY está activa, o intentamos de nuevo en un ratito? 💜`;
+    }
+
+    res.status(200).json({
+      source: "gemini_error_fallback",
+      text: friendlyText,
+      emotion: "tristeza",
+      incrementAction: false
     });
   }
 });
