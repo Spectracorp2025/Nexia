@@ -187,42 +187,36 @@ export async function loadOrCreateUserProfile(userId: string, email: string, fal
       await setDoc(docRef, newProfile);
       return newProfile;
     }
-  } catch (error) {
-    const errMsg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-    const isOffline = errMsg.includes("offline") || errMsg.includes("unavailable") || errMsg.includes("failed-precondition") || errMsg.includes("network") || errMsg.includes("connection");
+  } catch (error: any) {
+    const errMessage = error?.message || (error && typeof error === 'object' ? JSON.stringify(error) : String(error));
+    console.warn("Firestore error while loading user profile, falling back gracefully to LocalStorage:", errMessage);
     
-    if (isOffline) {
-      console.warn("Firestore is offline or unreachable. Falling back to LocalStorage for user profile configuration:", error);
-      const storageKey = `offline_profile_${userId}`;
-      const cached = localStorage.getItem(storageKey);
-      if (cached) {
-        try {
-          const profile = JSON.parse(cached) as UserProfile;
-          if (adminEmailMatch) {
-            profile.rank = "plus";
-          }
-          return profile;
-        } catch {
-          // ignore cache parsing error
+    const storageKey = `offline_profile_${userId}`;
+    const cached = localStorage.getItem(storageKey);
+    if (cached) {
+      try {
+        const profile = JSON.parse(cached) as UserProfile;
+        if (adminEmailMatch) {
+          profile.rank = "plus";
         }
+        return profile;
+      } catch {
+        // ignore cache parsing error
       }
-      
-      const fallbackProfile: UserProfile = {
-        userId,
-        username: fallbackUsername || email.split("@")[0] || "Usuario",
-        email,
-        rank: adminEmailMatch ? "plus" : "gratuito",
-        registeredAt: new Date().toISOString(),
-        actionsToday: 0,
-        lastActionReset: new Date().toISOString(),
-        settings: DEFAULT_SETTINGS
-      };
-      localStorage.setItem(storageKey, JSON.stringify(fallbackProfile));
-      return fallbackProfile;
     }
     
-    handleFirestoreError(error, OperationType.WRITE, path);
-    throw error;
+    const fallbackProfile: UserProfile = {
+      userId,
+      username: fallbackUsername || email.split("@")[0] || "Usuario",
+      email,
+      rank: adminEmailMatch ? "plus" : "gratuito",
+      registeredAt: new Date().toISOString(),
+      actionsToday: 0,
+      lastActionReset: new Date().toISOString(),
+      settings: DEFAULT_SETTINGS
+    };
+    localStorage.setItem(storageKey, JSON.stringify(fallbackProfile));
+    return fallbackProfile;
   }
 }
 
@@ -263,31 +257,17 @@ export async function updateUserProfileOnDb(userId: string, updates: Partial<Use
       };
       await setDoc(docRef, nextData);
     }
-  } catch (error) {
-    const errMsg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-    const isOffline = errMsg.includes("offline") || errMsg.includes("unavailable") || errMsg.includes("failed-precondition") || errMsg.includes("network") || errMsg.includes("connection");
+  } catch (error: any) {
+    const errMessage = error?.message || (error && typeof error === 'object' ? JSON.stringify(error) : String(error));
+    console.warn("Firestore error while updating profile, gracefully falling back to LocalStorage caching:", errMessage);
     
-    if (isOffline) {
-      console.warn("Firestore is offline or unreachable. Saving updates to LocalStorage for offline profile:", error);
-      const storageKey = `offline_profile_${userId}`;
-      const cached = localStorage.getItem(storageKey);
-      let current: UserProfile;
-      if (cached) {
-        try {
-          current = JSON.parse(cached);
-        } catch {
-          current = {
-            userId,
-            username: updates.username || auth.currentUser?.displayName || "Usuario",
-            email: currentUserEmail,
-            rank: adminEmailMatch ? "plus" : "gratuito",
-            registeredAt: new Date().toISOString(),
-            actionsToday: 0,
-            lastActionReset: new Date().toISOString(),
-            settings: DEFAULT_SETTINGS
-          };
-        }
-      } else {
+    const storageKey = `offline_profile_${userId}`;
+    const cached = localStorage.getItem(storageKey);
+    let current: UserProfile;
+    if (cached) {
+      try {
+        current = JSON.parse(cached);
+      } catch {
         current = {
           userId,
           username: updates.username || auth.currentUser?.displayName || "Usuario",
@@ -299,18 +279,27 @@ export async function updateUserProfileOnDb(userId: string, updates: Partial<Use
           settings: DEFAULT_SETTINGS
         };
       }
-      
-      const nextData = {
-        ...current,
-        ...updates,
-        rank: adminEmailMatch ? "plus" : current.rank,
-        userId: current.userId,
-        registeredAt: current.registeredAt
+    } else {
+      current = {
+        userId,
+        username: updates.username || auth.currentUser?.displayName || "Usuario",
+        email: currentUserEmail,
+        rank: adminEmailMatch ? "plus" : "gratuito",
+        registeredAt: new Date().toISOString(),
+        actionsToday: 0,
+        lastActionReset: new Date().toISOString(),
+        settings: DEFAULT_SETTINGS
       };
-      localStorage.setItem(storageKey, JSON.stringify(nextData));
-      return;
     }
     
-    handleFirestoreError(error, OperationType.WRITE, path);
+    const nextData = {
+      ...current,
+      ...updates,
+      rank: adminEmailMatch ? "plus" : current.rank,
+      userId: current.userId,
+      registeredAt: current.registeredAt
+    };
+    localStorage.setItem(storageKey, JSON.stringify(nextData));
+    return;
   }
 }
