@@ -41,11 +41,13 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
         await updateProfile(cred.user, { displayName: username });
         // Create user profile document in Firestore
         await loadOrCreateUserProfile(cred.user.uid, email, username);
+        sessionStorage.setItem("nexia_active_session", "true");
         onAuthSuccess(cred.user.uid);
       } else if (mode === "login") {
         // Login
         const cred = await signInWithEmailAndPassword(auth, email, password);
         await loadOrCreateUserProfile(cred.user.uid, email, cred.user.displayName || "");
+        sessionStorage.setItem("nexia_active_session", "true");
         onAuthSuccess(cred.user.uid);
       } else {
         // Recover password
@@ -81,6 +83,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       await loadOrCreateUserProfile(cred.user.uid, cred.user.email || "", cred.user.displayName || "Sintonizado Google");
+      sessionStorage.setItem("nexia_active_session", "true");
       onAuthSuccess(cred.user.uid);
     } catch (err: any) {
       console.error(err);
