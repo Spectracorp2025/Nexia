@@ -141,38 +141,49 @@ export default function App() {
     let unsub: (() => void) | null = null;
 
     const initAuth = async () => {
-      // Force sign-out on fresh page loads so the user ALWAYS starts at the AuthScreen login
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error("Initial signout error:", err);
-      }
-
-      if (!active) return;
-
+      // We immediately set up onAuthStateChanged so the loading screen parses instantly
       unsub = onAuthStateChanged(auth, async (user) => {
         if (!active) return;
         if (user) {
+          // If there is no active nexia session in sessionStorage (indicating a fresh page visit or new tab),
+          // we force the user to sign out so that they always start at the login form.
+          const hasActiveSession = sessionStorage.getItem("nexia_active_session");
+          if (!hasActiveSession) {
+            try {
+              setCurrentUser(null);
+              setProfile(null);
+              setAuthLoading(false);
+              await signOut(auth);
+            } catch (err) {
+              console.error("Session signout error:", err);
+            }
+            return;
+          }
+
           setCurrentUser(user);
           // Load or create Firestore statistics
           const p = await loadOrCreateUserProfile(user.uid, user.email || "", user.displayName || "");
           
-          // Immediate client safety override for Creator's Admin Email
-          if (isAdminEmail(user.email || "")) {
-            p.rank = "plus";
-          }
-          setProfile(p);
-          
-          // Greet user on first connection if they are NOT a new user
-          if (!p.isNewUser) {
-            greetUser(p);
+          if (active) {
+            // Immediate client safety override for Creator's Admin Email
+            if (isAdminEmail(user.email || "")) {
+              p.rank = "plus";
+            }
+            setProfile(p);
+            
+            // Greet user on first connection if they are NOT a new user
+            if (!p.isNewUser) {
+              greetUser(p);
+            }
+            setAuthLoading(false);
           }
         } else {
+          sessionStorage.removeItem("nexia_active_session");
           setCurrentUser(null);
           setProfile(null);
           setMessages([]);
+          setAuthLoading(false);
         }
-        setAuthLoading(false);
       });
     };
 
