@@ -740,12 +740,29 @@ export default function App() {
 
       // Increment daily action limit if counted
       if (data.incrementAction) {
-        const nextActionsVal = profile.actionsToday + 1;
-        setProfile({ ...profile, actionsToday: nextActionsVal });
-        // Update to DB
-        await updateDoc(doc(db, "users", profile.userId), {
-          actionsToday: nextActionsVal
-        });
+        const nextActionsVal = (profile?.actionsToday || 0) + 1;
+        if (profile) {
+          setProfile({ ...profile, actionsToday: nextActionsVal });
+          // Update to DB only if NOT a guest
+          if (!profile.userId.startsWith("invitado_")) {
+            try {
+              await updateDoc(doc(db, "users", profile.userId), {
+                actionsToday: nextActionsVal
+              });
+            } catch (err) {
+              console.error("Error updating actionsToday count in Firestore:", err);
+            }
+          } else {
+            // Update in localStorage for Guest
+            const guestKey = `guest_profile_${profile.userId}`;
+            const currentLocal = localStorage.getItem(guestKey);
+            if (currentLocal) {
+              const dataObj = JSON.parse(currentLocal);
+              dataObj.actionsToday = nextActionsVal;
+              localStorage.setItem(guestKey, JSON.stringify(dataObj));
+            }
+          }
+        }
       }
 
     } catch (e: any) {
@@ -806,11 +823,19 @@ export default function App() {
     };
     setProfile(nextProf);
     
-    // Write directly bypassing profile safety lock using a standard custom admin schema update
-    await setDoc(doc(db, "users", profile.userId), {
-      ...profile,
-      rank: newRank
-    });
+    // Write directly bypassing profile safety lock using a standard custom admin schema update only if NOT a guest
+    if (!profile.userId.startsWith("invitado_")) {
+      try {
+        await setDoc(doc(db, "users", profile.userId), {
+          ...profile,
+          rank: newRank
+        });
+      } catch (err) {
+        console.error("Error setting rank in Firestore:", err);
+      }
+    } else {
+      localStorage.setItem(`guest_profile_${profile.userId}`, JSON.stringify(nextProf));
+    }
   };
 
   // Trigger alarms reminders popup
@@ -826,9 +851,23 @@ export default function App() {
   const handleMarkSelectedReminderCompleted = async (rem: Reminder) => {
     if (!profile) return;
     setPendingReminders(prev => prev.filter(r => r.id !== rem.id));
-    await updateDoc(doc(db, "users", profile.userId, "reminders", rem.id), {
-      completed: true
-    });
+    if (!profile.userId.startsWith("invitado_")) {
+      try {
+        await updateDoc(doc(db, "users", profile.userId, "reminders", rem.id), {
+          completed: true
+        });
+      } catch (err) {
+        console.error("Error setting reminder completed in Firestore:", err);
+      }
+    } else {
+      const guestKey = `guest_reminders_${profile.userId}`;
+      const localRem = localStorage.getItem(guestKey);
+      if (localRem) {
+        const remList = JSON.parse(localRem) as Reminder[];
+        const updatedList = remList.map(r => r.id === rem.id ? { ...r, completed: true } : r);
+        localStorage.setItem(guestKey, JSON.stringify(updatedList));
+      }
+    }
   };
 
   // Theme-driven CSS variables mapper
